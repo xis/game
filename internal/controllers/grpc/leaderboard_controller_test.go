@@ -152,6 +152,6 @@ func (suite *LeaderboardControllerTestSuite) TestSubmitUserScore_ResourceNotFoun
 	result, err := suite.controller.SubmitUserScore(ctx, &leaderboardpb.SubmitUserScoreRequest{
 		Score: 86,
 	})
-	suite.ErrorIs(err, domain.ErrResourceNotFound)
+	suite.ErrorIs(err, ErrUserNotFound)
 	suite.Empty(result)
 }
