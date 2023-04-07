@@ -131,3 +131,85 @@ func (suite *RedisUserScoreRepositoryTestSuite) TestGetLeaderboard() {
 	_, err := suite.repository.GetLeaderboard(context.Background())
 	suite.NoError(err)
 }
+
+func (suite *RedisUserScoreRepositoryTestSuite) TestGetLeaderboard_ZRevRangeWithScoresFailed() {
+	someError := errors.New("some error")
+
+	suite.redisMock.
+		ExpectZRevRangeWithScores("leaderboard", 0, -1).
+		SetErr(someError)
+
+	_, err := suite.repository.GetLeaderboard(context.Background())
+	suite.ErrorIs(err, someError)
+}
+
+func (suite *RedisUserScoreRepositoryTestSuite) TestGetLeaderboard_GetUsersByIDsFailed() {
+	someError := errors.New("some error")
+
+	suite.redisMock.
+		ExpectZRevRangeWithScores("leaderboard", 0, -1).
+		SetVal([]redis.Z{
+			{
+				Score:  900,
+				Member: "user-id-1",
+			},
+			{
+				Score:  800,
+				Member: "user-id-2",
+			},
+		})
+
+	suite.mockUserRepository.
+		EXPECT().
+		GetUsersByIDs(mock.Anything, []string{"user-id-1", "user-id-2"}).
+		Return(nil, someError)
+
+	_, err := suite.repository.GetLeaderboard(context.Background())
+	suite.ErrorIs(err, someError)
+}
+
+func (suite *RedisUserScoreRepositoryTestSuite) TestGetLeaderboard_GetUsersByIDsNotFound() {
+	suite.redisMock.
+		ExpectZRevRangeWithScores("leaderboard", 0, -1).
+		SetVal([]redis.Z{
+			{
+				Score:  900,
+				Member: "user-id-1",
+			},
+			{
+				Score:  800,
+				Member: "user-id-2",
+			},
+		})
+
+	suite.mockUserRepository.
+		EXPECT().
+		GetUsersByIDs(mock.Anything, []string{"user-id-1", "user-id-2"}).
+		Return(nil, nil)
+
+	_, err := suite.repository.GetLeaderboard(context.Background())
+	suite.ErrorIs(err, domain.ErrInternal)
+}
+
+func (suite *RedisUserScoreRepositoryTestSuite) TestGetLeaderboard_GetUsersByIDsEmpty() {
+	suite.redisMock.
+		ExpectZRevRangeWithScores("leaderboard", 0, -1).
+		SetVal([]redis.Z{
+			{
+				Score:  900,
+				Member: "user-id-1",
+			},
+			{
+				Score:  800,
+				Member: "user-id-2",
+			},
+		})
+
+	suite.mockUserRepository.
+		EXPECT().
+		GetUsersByIDs(mock.Anything, []string{"user-id-1", "user-id-2"}).
+		Return([]domain.User{}, nil)
+
+	_, err := suite.repository.GetLeaderboard(context.Background())
+	suite.ErrorIs(err, domain.ErrInternal)
+}
