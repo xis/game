@@ -14,15 +14,18 @@ type LeaderboardService interface {
 
 type LeaderboardServiceDependencies struct {
 	UserScoreRepository domain.UserScoreRepository
+	UserRepository      domain.UserRepository
 }
 
 type leaderboardService struct {
 	userScoreRepository domain.UserScoreRepository
+	userRepository      domain.UserRepository
 }
 
 func NewLeaderboardService(deps LeaderboardServiceDependencies) *leaderboardService {
 	return &leaderboardService{
 		userScoreRepository: deps.UserScoreRepository,
+		userRepository:      deps.UserRepository,
 	}
 }
 
@@ -36,6 +39,15 @@ func (service *leaderboardService) GetLeaderboard(ctx context.Context) (domain.L
 }
 
 func (service *leaderboardService) SubmitUserScore(ctx context.Context, userID string, score float64) error {
+	exists, err := service.userRepository.CheckExistsByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return domain.ErrResourceNotFound
+	}
+
 	userTopScore, err := service.userScoreRepository.GetUserTopScore(ctx, userID)
 	if err != nil && err != domain.ErrResourceNotFound {
 		return err
