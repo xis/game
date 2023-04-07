@@ -20,7 +20,7 @@ This is a simple game service that is used to authenticate users, get the leader
 ## Actions in the Service
 
 You can access these actions using gRPC. 
-All client and server code are generated at [github.com/xis/game/internal/proto](github.com/xis/game/internal/proto).
+All client and server code are generated at [https://github.com/xis/game/tree/main/internal/proto](https://github.com/xis/game/tree/main/internal/proto).
 
 ## 1. `Login`
 The login action is used to authenticate the user. It returns a JWT token that is used to authorize the user in the other actions.
