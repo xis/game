@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package leaderboard;
+
+option go_package = "protobuf/leaderboard";
+
+service LeaderboardService {
+  rpc GetLeaderboard (GetLeaderboardRequest) returns (GetLeaderboardResponse) {}
+  rpc SubmitUserScore (SubmitUserScoreRequest) returns (SubmitUserScoreResponse) {}
+}
+
+message UserScore {
+  string userID = 1;
+  string username = 2;
+  double score = 3;
+}
+
+message GetLeaderboardResponse {
+    string status = 1;
+    int64 timestamp = 2;
+    repeated UserScore results = 3;
+}
+
+message GetLeaderboardRequest {}
+
+message SubmitUserScoreRequest {
+  double score = 1;
+}
+
+message SubmitUserScoreResponse {
+  string status = 1;
+  int64 timestamp = 2;
+}
