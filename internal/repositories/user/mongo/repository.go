@@ -87,13 +87,29 @@ func (repo *MongoUserRepository) CheckExistsByName(ctx context.Context, username
 	return count > 0, nil
 }
 
+func (repo *MongoUserRepository) CheckExistsByID(ctx context.Context, id string) (bool, error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, ErrInvalidID
+	}
+
+	count, err := repo.usersCollection.CountDocuments(ctx, bson.M{
+		"_id": objectID,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
 func (repo *MongoUserRepository) GetUsersByIDs(ctx context.Context, ids []string) ([]domain.User, error) {
 	objectIDs := make([]primitive.ObjectID, len(ids))
 
 	for i, id := range ids {
 		objectID, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
-			return nil, err
+			return nil, ErrInvalidID
 		}
 
 		objectIDs[i] = objectID

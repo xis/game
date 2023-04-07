@@ -22,6 +22,59 @@ func (_m *MockUserRepository) EXPECT() *MockUserRepository_Expecter {
 	return &MockUserRepository_Expecter{mock: &_m.Mock}
 }
 
+// CheckExistsByID provides a mock function with given fields: ctx, id
+func (_m *MockUserRepository) CheckExistsByID(ctx context.Context, id string) (bool, error) {
+	ret := _m.Called(ctx, id)
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (bool, error)); ok {
+		return rf(ctx, id)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) bool); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockUserRepository_CheckExistsByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CheckExistsByID'
+type MockUserRepository_CheckExistsByID_Call struct {
+	*mock.Call
+}
+
+// CheckExistsByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id string
+func (_e *MockUserRepository_Expecter) CheckExistsByID(ctx interface{}, id interface{}) *MockUserRepository_CheckExistsByID_Call {
+	return &MockUserRepository_CheckExistsByID_Call{Call: _e.mock.On("CheckExistsByID", ctx, id)}
+}
+
+func (_c *MockUserRepository_CheckExistsByID_Call) Run(run func(ctx context.Context, id string)) *MockUserRepository_CheckExistsByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockUserRepository_CheckExistsByID_Call) Return(_a0 bool, _a1 error) *MockUserRepository_CheckExistsByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockUserRepository_CheckExistsByID_Call) RunAndReturn(run func(context.Context, string) (bool, error)) *MockUserRepository_CheckExistsByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CheckExistsByName provides a mock function with given fields: ctx, username
 func (_m *MockUserRepository) CheckExistsByName(ctx context.Context, username string) (bool, error) {
 	ret := _m.Called(ctx, username)
